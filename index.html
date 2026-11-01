@@ -269,6 +269,15 @@ tr.todayrow td{background:var(--accent-soft)}
 .totals{display:flex;justify-content:flex-end;gap:28px;flex-wrap:wrap;margin:14px 0;font-size:14px}
 .totals b{font-family:var(--display);font-size:20px;display:block}
 
+.ttg{min-width:720px}
+.ttg th,.ttg td{text-align:center;vertical-align:middle;padding:8px 6px}
+.ttg td:first-child,.ttg th:first-child{text-align:left;white-space:nowrap}
+.ttg td.brk{background:var(--accent-soft);color:var(--accent-ink);font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:12px}
+.ttg td.clash{background:var(--bad-soft)}
+.ttg th.istoday,.ttg td.istoday{background:var(--accent-soft)}
+.ttg select.in{padding:6px 6px;font-size:13px;min-width:120px}
+.ttg .t{font-size:12px;color:var(--muted);display:block}
+
 /* mobile */
 @media (max-width:900px){
   #login{grid-template-columns:1fr}
@@ -1130,7 +1139,7 @@ tr.todayrow td{background:var(--accent-soft)}
           <div><label class="f">Web address</label><input class="in" placeholder="school-name.yourapp.com"></div>
         </div>
         <label class="f">Modules to switch on</label>
-        <div class="radios"><label><input type="checkbox" checked disabled> Students and marks</label><label><input type="checkbox" checked> Attendance</label><label><input type="checkbox" checked> eChat</label><label><input type="checkbox"> Hostel</label><label><input type="checkbox"> Fees</label></div>
+        <div class="radios"><label><input type="checkbox" checked disabled> Students and marks</label><label><input type="checkbox" checked> Attendance</label><label><input type="checkbox" checked> eChat</label><label><input type="checkbox"> Hostel</label><label><input type="checkbox"> Fees</label><label><input type="checkbox"> Timetable</label><label><input type="checkbox"> WhatsApp and SMS</label><label><input type="checkbox"> Mobile app</label></div>
         <button class="btn" id="nschBtn" style="margin-top:12px">Create school</button>
       </div>
     </section>
@@ -1249,6 +1258,87 @@ tr.todayrow td{background:var(--accent-soft)}
       <div class="panel"><div class="tablewrap"><table>
         <thead><tr><th>Fee</th><th>Due date</th><th class="amt">Amount</th><th>Status</th><th></th></tr></thead><tbody id="myBody"></tbody></table></div>
         <p class="hint">Please pay at the school office. Online payment is not part of this version.</p></div>
+    </section>
+
+    <!-- ===== Timetable ===== -->
+    <section data-screen="timetable" class="hidden">
+      <div class="page-head"><div><h1 id="ttTitle">Timetable</h1><p id="ttSub">Weekly periods for every class and teacher.</p></div>
+        <div class="no-print" style="display:flex;gap:10px"><button class="btn ghost" data-toast="Timetable PDF download would start here">Download PDF</button></div></div>
+      <div class="tabs wrap" id="ttTabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="tt-class">Class timetable</button>
+        <button role="tab" aria-selected="false" data-tab="tt-teacher">Teacher timetable</button>
+        <button role="tab" aria-selected="false" data-tab="tt-periods">Periods and breaks</button>
+        <button role="tab" aria-selected="false" data-tab="tt-sub">Substitutions</button>
+      </div>
+      <div class="panel tabpane on" id="tt-class">
+        <div class="toolbar"><select class="in" id="ttClass" aria-label="Class"></select><span id="ttClash" style="align-self:center;font-weight:600"></span></div>
+        <div class="tablewrap"><table class="ttg" id="ttGrid"></table></div>
+        <p class="hint" id="ttHint">Choose a subject for each period. The teacher is filled in from the subject, and a clash is flagged if that teacher is already teaching another class at the same time.</p>
+      </div>
+      <div class="panel tabpane" id="tt-teacher">
+        <div class="toolbar"><select class="in" id="ttTeacher" aria-label="Teacher"></select><span id="ttLoad" class="muted" style="align-self:center"></span></div>
+        <div class="tablewrap"><table class="ttg" id="ttTGrid"></table></div>
+      </div>
+      <div class="panel tabpane" id="tt-periods">
+        <div class="tablewrap"><table><thead><tr><th>Slot</th><th>Starts</th><th>Ends</th></tr></thead><tbody id="ttPerBody"></tbody></table></div>
+        <button class="btn" style="margin-top:14px" id="ttPerSave">Save timings</button>
+        <p class="hint">Changing a timing updates every class and teacher timetable.</p>
+      </div>
+      <div class="panel tabpane" id="tt-sub">
+        <div class="inline-form" style="margin-top:0">
+          <div><label class="f">Absent teacher</label><select class="in" id="subTeacher"></select></div>
+          <div><label class="f">Date</label><input class="in" type="date" id="subDate" value="2026-10-26"></div>
+          <button class="btn" id="subFind">Find free teachers</button>
+        </div>
+        <div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>Period</th><th>Class</th><th>Subject</th><th>Substitute</th><th></th></tr></thead><tbody id="subBody"><tr><td colspan="5" class="muted">Choose a teacher and date, then find free teachers.</td></tr></tbody></table></div>
+        <h3 class="sec-h">Substitution log</h3>
+        <div class="tablewrap"><table><thead><tr><th>Date</th><th>Absent</th><th>Period and class</th><th>Substitute</th><th>Status</th></tr></thead><tbody id="subLog"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ===== WhatsApp and notifications ===== -->
+    <section data-screen="notify" class="hidden">
+      <div class="page-head"><div><h1>WhatsApp and notifications</h1><p>Choose what is sent, to whom, and how. See every message that went out.</p></div></div>
+      <div class="tabs wrap" id="nfTabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="nf-conn">Connection</button>
+        <button role="tab" aria-selected="false" data-tab="nf-trig">What to send</button>
+        <button role="tab" aria-selected="false" data-tab="nf-tpl">Message templates</button>
+        <button role="tab" aria-selected="false" data-tab="nf-consent">Parent consent</button>
+        <button role="tab" aria-selected="false" data-tab="nf-log">Message log</button>
+      </div>
+      <div class="panel tabpane on" id="nf-conn">
+        <div class="figures" style="margin-bottom:18px"><div><b>1,240</b><span>WhatsApp this month</span></div><div><b>310</b><span>SMS this month</span></div><div><b>85</b><span>Email this month</span></div><div><b>2,960</b><span>App notifications</span></div></div>
+        <div class="formgrid">
+          <div><label class="f">WhatsApp provider</label><select class="in"><option>Choose a provider</option><option>Twilio</option><option>Gupshup</option><option>Interakt</option><option>Another provider</option></select></div>
+          <div><label class="f">WhatsApp business number</label><input class="in" inputmode="tel" placeholder="+91"></div>
+          <div><label class="f">Provider API key</label><input class="in" type="password" value="demo-key-0000"></div>
+          <div><label class="f">SMS sender name</label><input class="in" placeholder="6 letters"></div>
+          <div><label class="f">Send email from</label><input class="in" placeholder="office@school.example"></div>
+          <div><label class="f">Status</label><div style="padding:10px 0"><span class="pill ok">Connected (demo)</span></div></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn" data-toast="Connection saved.">Save connection</button><button class="btn ghost" id="nfTest">Send a test message</button></div>
+        <p class="hint">The school pays the provider directly for each message. Parents must agree to receive WhatsApp messages (see Parent consent).</p>
+      </div>
+      <div class="panel tabpane" id="nf-trig"><div class="tablewrap"><table class="matrix" id="nfMatrix"></table></div>
+        <button class="btn" style="margin-top:14px" data-toast="Notification settings saved.">Save settings</button></div>
+      <div class="panel tabpane" id="nf-tpl">
+        <p class="muted" style="margin:0 0 10px">WhatsApp only allows approved templates. Words in curly brackets are filled in automatically.</p>
+        <div class="tablewrap"><table><thead><tr><th>Template</th><th>Used for</th><th>Message</th><th>Status</th></tr></thead><tbody id="nfTplBody"></tbody></table></div>
+        <div class="inline-form">
+          <div><label class="f">Template name</label><input class="in" id="tplName" placeholder="exam_reminder"></div>
+          <div style="flex:2"><label class="f">Message</label><input class="in" id="tplMsg" placeholder="Dear parent, {student} has an exam on {date}."></div>
+          <button class="btn" id="tplAdd">Submit for approval</button>
+        </div>
+      </div>
+      <div class="panel tabpane" id="nf-consent">
+        <div class="figures" id="nfConsentFig" style="margin-bottom:16px;grid-template-columns:repeat(3,1fr)"></div>
+        <div class="toolbar"><button class="btn" id="nfAsk">Ask everyone not yet asked</button></div>
+        <div class="tablewrap"><table><thead><tr><th>Student</th><th>Guardian</th><th>Phone</th><th>WhatsApp consent</th></tr></thead><tbody id="nfConsentBody"></tbody></table></div>
+      </div>
+      <div class="panel tabpane" id="nf-log">
+        <div class="toolbar"><select class="in" id="logChan" aria-label="Channel"><option value="">All channels</option><option>WhatsApp</option><option>SMS</option><option>Email</option><option>App</option></select><select class="in" id="logStatus" aria-label="Status"><option value="">All statuses</option><option>Delivered</option><option>Sent</option><option>Failed</option></select></div>
+        <div class="tablewrap"><table><thead><tr><th>Time</th><th>To</th><th>Channel</th><th>For</th><th>Status</th><th></th></tr></thead><tbody id="logBody"></tbody></table></div>
+      </div>
     </section>
 
     <!-- Hostel -->
@@ -1413,6 +1503,8 @@ tr.todayrow td{background:var(--accent-soft)}
 <script>
 (function(){
   var icons={
+    timetable:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 5h16v15H4zM4 10h16M10 5v15M16 5v15\"/></svg>',
+    notify:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M6 9a6 6 0 0112 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 004 0\"/></svg>',
     'fees':'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 3v18M16 7c0-2-2-3-4-3s-4 1-4 3 2 3 4 3 4 1 4 3-2 3-4 3-4-1-4-3\"/></svg>',
     'feecollect':'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 7h18v10H3zM3 11h18M7 15h3\"/></svg>',
     'feedues':'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 8v5M12 17h.01M4 20h16L12 4z\"/></svg>',
@@ -1448,10 +1540,10 @@ tr.todayrow td{background:var(--accent-soft)}
     announce:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11v3a1 1 0 001 1h3l8 5V5L7 10H4a1 1 0 00-1 1zM18 8a5 5 0 010 8"/></svg>'
   };
   var roles={
-    admin:{label:'Management',name:'Office Admin',user:'admin',home:'dashboard',nav:[['dashboard','Dashboard'],['_','Students'],['admissions','Admissions'],['students','Students'],['register','Register student'],['promote','Year-end promotion'],['forms','Forms and certificates'],['_','People'],['staff','Staff'],['accounts','User accounts'],['roles','Roles and permissions'],['_','Academics'],['setup','Academic setup'],['datesheet','Datesheet'],['results','Marks and results'],['_','Fees'],['fees','Fee dashboard'],['feecollect','Collect fee'],['feedues','Dues and defaulters'],['feesetup','Fee setup'],['_','Campus'],['hostel','Hostel'],['echat','eChat'],['announce','Announcements'],['_','Administration'],['reports','Reports'],['import','Data import'],['masters','Masters and lists'],['settings','School settings']]},
-    teacher:{label:'Teacher',name:'Mrs. Kavita Arora',user:'k.arora',home:'classes',nav:[['classes','My classes'],['classlist','Student list'],['attendance','Attendance'],['marks','Enter marks'],['datesheet','Datesheet'],['echat','eChat'],['announce','Announcements']]},
+    admin:{label:'Management',name:'Office Admin',user:'admin',home:'dashboard',nav:[['dashboard','Dashboard'],['_','Students'],['admissions','Admissions'],['students','Students'],['register','Register student'],['promote','Year-end promotion'],['forms','Forms and certificates'],['_','People'],['staff','Staff'],['accounts','User accounts'],['roles','Roles and permissions'],['_','Academics'],['setup','Academic setup'],['timetable','Timetable'],['datesheet','Datesheet'],['results','Marks and results'],['_','Fees'],['fees','Fee dashboard'],['feecollect','Collect fee'],['feedues','Dues and defaulters'],['feesetup','Fee setup'],['_','Campus'],['hostel','Hostel'],['echat','eChat'],['announce','Announcements'],['_','Administration'],['reports','Reports'],['import','Data import'],['masters','Masters and lists'],['notify','WhatsApp and notifications'],['settings','School settings']]},
+    teacher:{label:'Teacher',name:'Mrs. Kavita Arora',user:'k.arora',home:'classes',nav:[['classes','My classes'],['classlist','Student list'],['attendance','Attendance'],['timetable','My timetable'],['marks','Enter marks'],['datesheet','Datesheet'],['echat','eChat'],['announce','Announcements']]},
     super:{label:'Platform',name:'Super Admin',user:'superadmin',home:'sa-dash',nav:[['sa-dash','Platform dashboard'],['sa-schools','Schools'],['sa-plans','Plans and modules'],['sa-support','Support tickets']]},
-    student:{label:'Student',name:'Aarav Sharma',user:'REG/2026/0412',home:'portal',nav:[['portal','My results'],['reportcard','Report card'],['myfees','My fees'],['datesheet','Datesheet'],['hostel','Hostel menu'],['echat','eChat'],['announce','Announcements']]}
+    student:{label:'Student',name:'Aarav Sharma',user:'REG/2026/0412',home:'portal',nav:[['portal','My results'],['reportcard','Report card'],['myfees','My fees'],['timetable','Timetable'],['datesheet','Datesheet'],['hostel','Hostel menu'],['echat','eChat'],['announce','Announcements']]}
   };
   var role='admin', current=null, previous='dashboard';
   var $=function(s,r){return (r||document).querySelector(s)};
@@ -1472,6 +1564,7 @@ tr.todayrow td{background:var(--accent-soft)}
     if(screen==='echat'&&window.chatInit)window.chatInit();
     if(screen==='datesheet'&&window.dsInit)window.dsInit();
     if(window.feeInit)window.feeInit(screen);
+    if(screen==='timetable'&&window.ttInit)window.ttInit();
     window.scrollTo(0,0);
   }
 
@@ -2020,7 +2113,12 @@ tr.todayrow td{background:var(--accent-soft)}
     ['EMP-003','Ms. Ritu Bhatia','Teacher','English','9 – A (class teacher)','98150 66003','Active'],
     ['EMP-004','Mr. Harish Verma','Hostel warden','–','–','98150 66004','Active'],
     ['EMP-005','Mrs. Anita Rana','Office clerk','–','–','98150 66005','Active'],
-    ['EMP-006','Dr. Sunil Kapoor','Principal','–','–','98150 66006','Active']
+    ['EMP-006','Dr. Sunil Kapoor','Principal','–','–','98150 66006','Active'],
+    ['EMP-007','Mr. Rakesh Dogra','Teacher','Hindi','8 – A, 8 – B, 9 – A','98150 66007','Active'],
+    ['EMP-008','Mrs. Pooja Walia','Teacher','Social Science','8 – A, 8 – B, 9 – A','98150 66008','Active'],
+    ['EMP-009','Mr. Gurmeet Bajwa','Teacher','Punjabi','8 – A, 8 – B, 9 – A','98150 66009','Active'],
+    ['EMP-010','Ms. Neha Sood','Teacher','Computer Science','8 – A, 8 – B, 9 – A','98150 66010','Active'],
+    ['EMP-011','Mr. Sunil Rana','Teacher','Physical education','8 – A, 8 – B, 9 – A','98150 66011','Active']
   ];
   function renderStaff(){
     var q=$('#stfSearch').value.toLowerCase(), r=$('#stfRole').value;
@@ -2043,7 +2141,7 @@ tr.todayrow td{background:var(--accent-soft)}
     ['View student records',[1,1,1,0,1]],['Register and edit students',[1,0,0,0,1]],['Manage accounts and logins',[1,0,0,0,0]],
     ['Set up classes, subjects and exams',[1,1,0,0,0]],['Enter marks',[0,0,1,0,0]],['Correct marks',[1,1,0,0,0]],['Publish results',[1,1,0,0,0]],
     ['Mark attendance',[0,0,1,1,0]],['View reports and exports',[1,1,1,0,1]],['Manage hostel',[1,0,0,1,0]],['Post announcements',[1,1,1,1,1]],
-    ['Import data',[1,0,0,0,0]],['School settings',[1,0,0,0,0]],['Collect fees and print receipts',[1,0,0,0,1]],['Fee setup and concessions',[1,0,0,0,0]]
+    ['Import data',[1,0,0,0,0]],['School settings',[1,0,0,0,0]],['Collect fees and print receipts',[1,0,0,0,1]],['Fee setup and concessions',[1,0,0,0,0]],['Manage timetable and substitutions',[1,1,0,0,0]],['Send notifications and WhatsApp',[1,1,0,0,1]]
   ];
   function renderRoles(){
     $('#roleMatrix').innerHTML='<thead><tr><th>Can do</th>'+roleCols.map(function(r){return '<th>'+r+'</th>'}).join('')+'</tr></thead><tbody>'+
@@ -2593,8 +2691,8 @@ tr.todayrow td{background:var(--accent-soft)}
     schools.unshift([esc(n),esc($('#nschCity').value.trim()||'–'),'CBSE',$('#nschPlan').value,0,0,'Trial',new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})]);
     $('#nsch').value='';$('#nschCity').value=''; renderSa(); toast('School created on a free trial. An invitation was sent to its admin.');
   });
-  var modsList=['Students and marks','Report cards','Announcements','Attendance','eChat','Hostel','Fees'];
-  var plans=[['Basic',10,[1,1,1,0,0,0,0]],['Standard',18,[1,1,1,1,1,0,0]],['Premium',25,[1,1,1,1,1,1,1]]];
+  var modsList=['Students and marks','Report cards','Announcements','Attendance','eChat','Hostel','Fees','Timetable','WhatsApp and SMS','Mobile app'];
+  var plans=[['Basic',10,[1,1,1,0,0,0,0,0,0,0]],['Standard',18,[1,1,1,1,1,0,0,1,0,0]],['Premium',25,[1,1,1,1,1,1,1,1,1,1]]];
   $('#planMatrix').innerHTML='<thead><tr><th>Module</th>'+plans.map(function(p){return '<th>'+p[0]+'</th>'}).join('')+'</tr></thead><tbody><tr><td><b>Price per student per month (₹)</b></td>'+plans.map(function(p){return '<td><input class="marks-in" style="width:70px" value="'+p[1]+'" inputmode="numeric"></td>'}).join('')+'</tr>'+
     modsList.map(function(m,i){return '<tr><td>'+m+'</td>'+plans.map(function(p){return '<td><input type="checkbox"'+(p[2][i]?' checked':'')+' aria-label="'+m+' in '+p[0]+'"></td>'}).join('')+'</tr>'}).join('')+'</tbody>';
   var tickets=[['T-214','Demo School 1','Report card PDF not downloading','Urgent','Open'],['T-213','Demo School 2','Need to import last year\'s students','Normal','In progress'],['T-211','Demo School 4','Add a new class section','Normal','Resolved'],['T-209','Demo School 5','Cannot sign in','Urgent','Open']];
@@ -2619,6 +2717,134 @@ tr.todayrow td{background:var(--accent-soft)}
     }
   });
   $('#logout').addEventListener('click',function(){ if(impOf){cfg=JSON.parse(savedCfg||'{"name":"","addr":"","board":"","code":"","logo":""}'); impOf=null; applySchool();} $('#impBanner').classList.add('hidden'); });
+  /* ================= Timetable ================= */
+  var TT_DAYS=['Mon','Tue','Wed','Thu','Fri','Sat'];
+  var TT_PER=[['Period 1','8:00','8:40'],['Period 2','8:40','9:20'],['Period 3','9:20','10:00'],['Break','10:00','10:20'],['Period 4','10:20','11:00'],['Period 5','11:00','11:40'],['Period 6','11:40','12:20'],['Period 7','12:20','1:00']];
+  var TT_SUBJ=[['English','Ms. Ritu Bhatia'],['Hindi','Mr. Rakesh Dogra'],['Mathematics','Mrs. Kavita Arora'],['Science','Mr. Jaspreet Singh'],['Social Science','Mrs. Pooja Walia'],['Punjabi','Mr. Gurmeet Bajwa'],['Computer Science','Ms. Neha Sood'],['Physical education','Mr. Sunil Rana']];
+  var TT_CLASSES=['8 – A','8 – B','9 – A'];
+  var TT_TEACH=TT_SUBJ.map(function(s){return s[1]});
+  var tt={};
+  TT_CLASSES.forEach(function(c,ci){tt[c]=TT_DAYS.map(function(d,di){var r=[];for(var p=0;p<7;p++) r.push((di+p+ci*3)%8); return r;});});
+  var TT_ROWS=TT_PER.map(function(r,i){return {i:i,brk:r[0]==='Break'}});
+  function ttPIdx(row){var n=0; for(var i=0;i<row;i++) if(TT_PER[i][0]!=='Break') n++; return n;}
+  function ttToday(){var d=new Date().getDay(); return d===0?-1:d-1;}
+  function ttClashes(){
+    var n=0, bad={};
+    for(var d=0;d<6;d++) for(var p=0;p<7;p++){
+      var seen={};
+      TT_CLASSES.forEach(function(c){var s=tt[c][d][p]; if(s<0) return; var t=TT_SUBJ[s][1]; if(seen[t]){n++; bad[c+d+p]=1; bad[seen[t]]=1;} else seen[t]=c+d+p;});
+    }
+    return {n:n,bad:bad};
+  }
+  function ttHead(){return '<thead><tr><th>Period</th>'+TT_DAYS.map(function(d,i){return '<th class="'+(i===ttToday()?'istoday':'')+'">'+d+'</th>'}).join('')+'</tr></thead>';}
+  function ttLabel(r){return '<td><b>'+TT_PER[r][0]+'</b><span class="t">'+TT_PER[r][1]+' – '+TT_PER[r][2]+'</span></td>';}
+  function renderTTClass(){
+    var c=$('#ttClass').value, edit=role==='admin', cl=ttClashes(), h=ttHead()+'<tbody>';
+    TT_PER.forEach(function(per,r){
+      if(per[0]==='Break'){h+='<tr>'+ttLabel(r)+'<td class="brk" colspan="6">Break</td></tr>';return;}
+      var p=ttPIdx(r); h+='<tr>'+ttLabel(r);
+      TT_DAYS.forEach(function(d,di){
+        var s=tt[c][di][p], bad=cl.bad[c+di+p], cls=(bad?'clash ':'')+(di===ttToday()?'istoday':'');
+        if(edit) h+='<td class="'+cls+'"><select class="in" data-tt="'+di+','+p+'" aria-label="'+d+' '+per[0]+'">'+'<option value="-1">—</option>'+TT_SUBJ.map(function(x,i){return '<option value="'+i+'"'+(i===s?' selected':'')+'>'+x[0]+'</option>'}).join('')+'</select>'+(s>=0?'<span class="t">'+TT_SUBJ[s][1]+'</span>':'')+(bad?'<span class="t" style="color:var(--bad)">Teacher clash</span>':'')+'</td>';
+        else h+='<td class="'+cls+'">'+(s>=0?'<b>'+TT_SUBJ[s][0]+'</b><span class="t">'+TT_SUBJ[s][1]+'</span>':'')+'</td>';
+      });
+      h+='</tr>';
+    });
+    $('#ttGrid').innerHTML=h+'</tbody>';
+    $('#ttClash').innerHTML=cl.n?'<span class="pill bad">'+cl.n+' teacher clash'+(cl.n>1?'es':'')+'</span>':'<span class="pill ok">No clashes</span>';
+  }
+  function renderTTTeacher(){
+    var t=$('#ttTeacher').value, h=ttHead()+'<tbody>', load=0;
+    TT_PER.forEach(function(per,r){
+      if(per[0]==='Break'){h+='<tr>'+ttLabel(r)+'<td class="brk" colspan="6">Break</td></tr>';return;}
+      var p=ttPIdx(r); h+='<tr>'+ttLabel(r);
+      TT_DAYS.forEach(function(d,di){
+        var hit=null; TT_CLASSES.forEach(function(c){var s=tt[c][di][p]; if(s>=0&&TT_SUBJ[s][1]===t) hit=[c,TT_SUBJ[s][0]];});
+        if(hit) load++;
+        h+='<td class="'+(di===ttToday()?'istoday':'')+'">'+(hit?'<b>'+hit[0]+'</b><span class="t">'+hit[1]+'</span>':'<span class="muted">Free</span>')+'</td>';
+      });
+      h+='</tr>';
+    });
+    $('#ttTGrid').innerHTML=h+'</tbody>'; $('#ttLoad').textContent=load+' periods a week';
+  }
+  function renderTTPer(){
+    $('#ttPerBody').innerHTML=TT_PER.map(function(r,i){return '<tr><td><b>'+r[0]+'</b></td><td><input class="in" data-per="'+i+',1" value="'+r[1]+'" style="width:110px"></td><td><input class="in" data-per="'+i+',2" value="'+r[2]+'" style="width:110px"></td></tr>'}).join('');
+  }
+  $('#ttClass').innerHTML=TT_CLASSES.map(function(c){return '<option>'+c+'</option>'}).join('');
+  $('#ttTeacher').innerHTML=TT_TEACH.map(function(t){return '<option>'+t+'</option>'}).join('');
+  $('#subTeacher').innerHTML=TT_TEACH.map(function(t){return '<option>'+t+'</option>'}).join('');
+  $('#ttClass').addEventListener('change',renderTTClass); $('#ttTeacher').addEventListener('change',renderTTTeacher);
+  $('#ttGrid').addEventListener('change',function(e){
+    var k=e.target.dataset.tt; if(!k) return; var a=k.split(','), c=$('#ttClass').value; tt[c][+a[0]][+a[1]]=+e.target.value; renderTTClass();
+    var cl=ttClashes(); if(cl.bad[c+a[0]+a[1]]) toast(TT_SUBJ[+e.target.value][1]+' is already teaching another class in this period.'); else toast('Timetable updated.');
+  });
+  $('#ttPerSave').addEventListener('click',function(){
+    $$('[data-per]').forEach(function(i){var a=i.dataset.per.split(','); TT_PER[+a[0]][+a[1]]=i.value;}); renderTTClass(); renderTTTeacher(); toast('Timings saved. All timetables updated.');
+  });
+  var subs=[['20-10-2026','Mr. Jaspreet Singh','Period 3 · 8 – A','Mrs. Pooja Walia','Assigned']];
+  function renderSubLog(){$('#subLog').innerHTML=subs.map(function(s){return '<tr><td>'+s[0]+'</td><td>'+s[1]+'</td><td>'+s[2]+'</td><td>'+s[3]+'</td><td><span class="pill ok">'+s[4]+'</span></td></tr>'}).join('');}
+  var subPending=[];
+  $('#subFind').addEventListener('click',function(){
+    var t=$('#subTeacher').value, dt=new Date($('#subDate').value+'T00:00:00'), di=dt.getDay()-1;
+    if(di<0){$('#subBody').innerHTML='<tr><td colspan="5" class="muted">The school has no classes on Sunday.</td></tr>';return;}
+    subPending=[]; var rows='';
+    for(var p=0;p<7;p++) TT_CLASSES.forEach(function(c){
+      var s=tt[c][di][p]; if(s<0||TT_SUBJ[s][1]!==t) return;
+      var busy={}; TT_CLASSES.forEach(function(c2){var s2=tt[c2][di][p]; if(s2>=0) busy[TT_SUBJ[s2][1]]=1;});
+      var free=TT_TEACH.filter(function(x){return !busy[x]&&x!==t});
+      var idx=subPending.push([p,c,TT_SUBJ[s][0]])-1;
+      rows+='<tr><td>Period '+(p+1)+'</td><td>'+c+'</td><td>'+TT_SUBJ[s][0]+'</td><td><select class="in" data-subsel="'+idx+'">'+(free.length?free.map(function(f){return '<option>'+f+'</option>'}).join(''):'<option>No one is free</option>')+'</select></td><td><button class="btn sm" data-subasg="'+idx+'">Assign</button></td></tr>';
+    });
+    $('#subBody').innerHTML=rows||'<tr><td colspan="5" class="muted">This teacher has no periods on that day.</td></tr>';
+  });
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-subasg]'); if(!b) return; var i=+b.dataset.subasg, sel=document.querySelector('[data-subsel="'+i+'"]').value, x=subPending[i];
+    if(sel==='No one is free'){toast('No teacher is free in that period.');return;}
+    var d=$('#subDate').value.split('-').reverse().join('-'); subs.unshift([d,$('#subTeacher').value,'Period '+(x[0]+1)+' · '+x[1],sel,'Assigned']); renderSubLog(); b.outerHTML='<span class="pill ok">Assigned</span>'; toast(sel+' will cover Period '+(x[0]+1)+' of '+x[1]+'. They will be notified.');
+  });
+  window.ttInit=function(){
+    var st=role==='student', tc=role==='teacher';
+    $('#ttTabs').classList.toggle('hidden',st||tc);
+    $$('#tt-class,#tt-teacher,#tt-periods,#tt-sub').forEach(function(p){p.classList.remove('on')});
+    if(tc){$('#ttTeacher').value='Mrs. Kavita Arora'; $('#ttTeacher').disabled=true; $('#tt-teacher').classList.add('on'); $('#ttTitle').textContent='My timetable'; $('#ttSub').textContent='Your classes for the week. Today is highlighted.';}
+    else if(st){$('#ttClass').value='8 – A'; $('#ttClass').disabled=true; $('#tt-class').classList.add('on'); $('#ttTitle').textContent='Timetable'; $('#ttSub').textContent='Your classes for the week. Today is highlighted.'; $('#ttHint').classList.add('hidden');}
+    else{$('#ttTeacher').disabled=false; $('#ttClass').disabled=false; $('#tt-class').classList.add('on'); $$('#ttTabs button').forEach(function(b,i){b.setAttribute('aria-selected',i===0)}); $('#ttTitle').textContent='Timetable'; $('#ttSub').textContent='Set periods for every class. Teachers and students see their own view.'; $('#ttHint').classList.remove('hidden');}
+    renderTTClass(); renderTTTeacher(); renderTTPer(); renderSubLog();
+  };
+  renderTTClass(); renderTTTeacher(); renderTTPer(); renderSubLog();
+
+  /* ================= WhatsApp and notifications ================= */
+  var nfEvents=[['Student marked absent',[1,1,0,0]],['Result published',[1,1,0,0]],['Fee due reminder',[1,1,1,0]],['Fee receipt',[1,1,0,1]],['New announcement',[1,0,0,0]],['Datesheet published',[1,1,0,0]],['Timetable change or substitution',[1,0,0,0]],['Gate pass approved or student returned',[1,1,1,0]],['Birthday wishes',[1,0,0,0]]];
+  function renderNfMatrix(){
+    $('#nfMatrix').innerHTML='<thead><tr><th>When this happens</th><th>App</th><th>WhatsApp</th><th>SMS</th><th>Email</th></tr></thead><tbody>'+nfEvents.map(function(ev,i){return '<tr><td>'+ev[0]+'</td>'+ev[1].map(function(v,j){return '<td><input type="checkbox" data-nf="'+i+','+j+'"'+(v?' checked':'')+' aria-label="'+ev[0]+'"></td>'}).join('')+'</tr>'}).join('')+'</tbody>';
+  }
+  $('#nfMatrix').addEventListener('change',function(e){var k=e.target.dataset.nf; if(k){var a=k.split(','); nfEvents[+a[0]][1][+a[1]]=e.target.checked?1:0;}});
+  renderNfMatrix();
+  var tpls=[['absence_alert','Student marked absent','Dear parent, {student} was absent on {date}.','Approved'],['fee_reminder','Fee due reminder','Dear parent, fee of {amount} for {student} is due on {date}. Please pay at the school office.','Approved'],['result_out','Result published','Results for {exam} are out. {student}\'s report card is ready.','Approved'],['gatepass','Gate pass','{student} is leaving the hostel on {date} with {person}.','Pending']];
+  function renderTpl(){$('#nfTplBody').innerHTML=tpls.map(function(t){return '<tr><td><b>'+t[0]+'</b></td><td>'+t[1]+'</td><td>'+t[2]+'</td><td><span class="pill '+(t[3]==='Approved'?'ok':t[3]==='Pending'?'warn':'bad')+'">'+t[3]+'</span></td></tr>'}).join('');}
+  $('#tplAdd').addEventListener('click',function(){var n=$('#tplName').value.trim(), m=$('#tplMsg').value.trim(); if(!n||!m){toast('Add a name and a message.');return;} tpls.push([esc(n),'Custom',esc(m),'Pending']); $('#tplName').value='';$('#tplMsg').value=''; renderTpl(); toast('Template sent to WhatsApp for approval. This usually takes a day or two.');});
+  renderTpl();
+  var consent=students.filter(function(s){return s[5]==='Active'}).map(function(s,i){return [s[1],s[3],s[4],['Opted in','Opted in','Not asked','Declined','Opted in'][i%5]]});
+  function renderConsent(){
+    var c=function(v){return consent.filter(function(x){return x[3]===v}).length};
+    $('#nfConsentFig').innerHTML='<div><b>'+c('Opted in')+'</b><span>Opted in</span></div><div><b>'+c('Not asked')+'</b><span>Not asked yet</span></div><div><b>'+c('Declined')+'</b><span>Declined</span></div>';
+    $('#nfConsentBody').innerHTML=consent.map(function(x,i){return '<tr><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td>'+x[2]+'</td><td><select class="in" data-cons="'+i+'" style="width:auto">'+['Opted in','Not asked','Declined'].map(function(o){return '<option'+(o===x[3]?' selected':'')+'>'+o+'</option>'}).join('')+'</select></td></tr>'}).join('');
+  }
+  $('#nfConsentBody').addEventListener('change',function(e){var i=e.target.dataset.cons; if(i!==undefined){consent[+i][3]=e.target.value; renderConsent();}});
+  $('#nfAsk').addEventListener('click',function(){var n=0; consent.forEach(function(x){if(x[3]==='Not asked'){x[3]='Not asked'; n++;}}); toast('Consent request sent on WhatsApp to '+n+' guardians.');});
+  renderConsent();
+  var msgLog=[['11:02 am','Neha Gupta','WhatsApp','Fee receipt','Delivered'],['10:35 am','Harpreet Singh','WhatsApp','Student marked absent','Delivered'],['10:30 am','Rajesh Sharma','SMS','Fee due reminder','Sent'],['9:50 am','Sunil Verma','WhatsApp','Result published','Failed'],['9:20 am','All students','App','New announcement','Delivered'],['9:05 am','Mukesh Jain','WhatsApp','Gate pass approved','Delivered'],['Yesterday','Amrit Gill','Email','Fee due reminder','Failed']];
+  function renderLog(){
+    var ch=$('#logChan').value, st=$('#logStatus').value;
+    $('#logBody').innerHTML=msgLog.map(function(m,i){
+      if((ch&&m[2]!==ch)||(st&&m[4]!==st)) return '';
+      return '<tr><td>'+m[0]+'</td><td>'+m[1]+'</td><td>'+m[2]+'</td><td>'+m[3]+'</td><td><span class="pill '+(m[4]==='Failed'?'bad':m[4]==='Delivered'?'ok':'warn')+'">'+m[4]+'</span></td><td>'+(m[4]==='Failed'?'<button class="btn ghost sm" data-retry="'+i+'">Try again</button>':'')+'</td></tr>';
+    }).join('')||'<tr><td colspan="6" class="muted">No messages match.</td></tr>';
+  }
+  $('#logChan').addEventListener('change',renderLog); $('#logStatus').addEventListener('change',renderLog);
+  document.addEventListener('click',function(e){var b=e.target.closest('[data-retry]'); if(b){msgLog[+b.dataset.retry][4]='Sent'; renderLog(); toast('Message sent again.');}});
+  $('#nfTest').addEventListener('click',function(){msgLog.unshift(['now','Test number','WhatsApp','Test message','Delivered']); renderLog(); toast('Test message sent. See it in the Message log.');});
+  renderLog();
 })();
 </script>
 </body>
